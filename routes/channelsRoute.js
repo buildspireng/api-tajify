@@ -1,7 +1,7 @@
 const express = require('express');
 const channelsController = require('../controllers/channelsController');
 const { isAuthProtected, isRestricted } = require('../middlewares/protected');
-const { uploadSingleTube, uploadSingleAudio, uploadSingleImage } = require('../middlewares/multer');
+const { uploadSingleTube, uploadSingleAudio, uploadSingleImage, uploadEbook, uploadAudioBook } = require('../middlewares/multer');
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -22,8 +22,8 @@ router.post("/tubes/upload", uploadSingleTube, isAuthProtected, channelsControll
 router.patch("/tubes/:id", isAuthProtected, channelsController.updateOneTubeById);
 router.delete("/tubes/:id", isAuthProtected, channelsController.deleteOneTubeById);
 
-
-
+ 
+ 
 //////////////////////////////////////////////////
 // MUSIC
 //////////////////////////////////////////////////
@@ -50,5 +50,24 @@ router.post("/podcasts/episode/:id", uploadSingleAudio, isAuthProtected, channel
 router.patch("/podcasts/:id", isAuthProtected, channelsController.updateOnePodcastById);
 router.delete("/podcasts/:id", isAuthProtected, channelsController.deleteOnePodcastById);
 
+////////////////////////////////////////////////// 
+////////BOOKS
+//////////////////////////////////////////////////
+router.get("/audiobooks", isAuthProtected, channelsController.getAllAudioBooks);
+router.get("/ebooks", isAuthProtected, channelsController.getAllEBooks);
+router.get("/audiobook/:id",isAuthProtected, channelsController.getAudioBookById);
+router.get("/ebook/:id", isAuthProtected, channelsController.getEBookById);
+router.get("/books/my-audiobooks", isAuthProtected, channelsController.getAllMyAudioBooks);
+router.get("/books/my-ebooks", isAuthProtected, channelsController.getAllMyEBooks);
 
-module.exports = router;
+router.post("/books/upload", uploadEbook, isAuthProtected, channelsController.createEBook);
+router.post("/books/upload-audio", uploadAudioBook, isAuthProtected, channelsController.createAudioBook);
+
+router.patch("/ebook/:id", isAuthProtected, channelsController.updateEBook);
+router.patch("/audiobook/:id", isAuthProtected, channelsController.updateAudioBook);
+
+router.delete("/books/:id", isAuthProtected, channelsController.deleteEBook);
+router.delete("/books/:id", isAuthProtected, channelsController.deleteAudioBook);
+
+ 
+module.exports = router; 

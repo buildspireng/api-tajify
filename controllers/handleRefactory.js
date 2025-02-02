@@ -1,3 +1,4 @@
+const Profile = require("../models/profileModel");
 const { asyncWrapper } = require("../utils/handlers");
 const { FirstCap } = require("../utils/helpers");
 
@@ -69,17 +70,20 @@ exports.getAll = function(Model, title) {
 }
 
 
-exports.getAllMine = function(Model, title) {
+exports.getAllMine = function(Model, title, queryField) {
     return asyncWrapper(async function(req, res) {
         const userId = req.user._id;
+        const profile = await Profile.findOne({ user: userId, isCreator: true });
+        if(!profile) return res.json({ message: "You are not a creator!" })
+
         const docTitle = `${title}s`
         
         const myDocuments = await Model.find({
-            creator: userId
+            [queryField]: profile._id
         }).sort({ createAt: -1 });
 
         if(!myDocuments || myDocuments.length < 1) {
-            res.json({ message: `No ${title} found!` });
+           return res.json({ message: `No ${title} found!` });
         }
 
         res.status(200).json({
@@ -108,12 +112,35 @@ exports.getOne = function(Model, title) {
 }
 
 
-exports.createOne = function(Model, title, ownerTitle) {
+exports.createOne = function(Model, title, queryField) {
     return asyncWrapper(async function(req, res) {
         const userId = req.user._id;
+        const profile = await Profile.findOne({ user: userId });
 
         const document = await Model.create({
-            [ownerTitle]: userId,
+            [queryField]: profile._id,
+            ...req.body
+        });
+
+        res.status(201).json({
+            status: "success",
+            message: `${FirstCap(title)} created!`,
+            data: { [title]: document }
+        })
+    })
+}
+
+
+exports.createOneCreator = function(Model, title, queryField) {
+    return asyncWrapper(async function(req, res) {
+        const userId = req.user._id;
+        const creator = await Profile.findOne({ user: userId, isCreator: true });
+        if(!creator) {
+            return json({ message: "You're not a creator!" })
+        }
+
+        const document = await Model.create({
+            [queryField]: creator._id,
             ...req.body
         });
 
