@@ -10,7 +10,7 @@ const Profile = require("../models/profileModel");
 
 
 exports.signupUser = asyncWrapper(async function(req, res) {
-    const { fullname, username, email, password, passwordConfirm, phoneNumber } = req.body;
+    const { fullname, referralCode, username, email, password, passwordConfirm, phoneNumber } = req.body;
 
     // CHECK IF THE EMAIL ALREADY EXISTS
     const emailExist = await User.findOne({ email });
